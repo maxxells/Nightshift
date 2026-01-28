@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Nightshift V2.1</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+/* === FRACTAL BACKGROUND (SVG) === */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(0,200,180,.15), transparent 40%),
+    radial-gradient(circle at 80% 60%, rgba(0,120,255,.15), transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(0,180,120,.12), transparent 50%);
+  z-index:-1;
+}
+
+/* === THEME === */
+
+:root{
+  --bg:#071420;
+  --card:#0e2236;
+  --accent:#21d4c2;
+  --accent2:#2ea1ff;
+  --ok:#2ecc71;
+  --warn:#f39c12;
+  --text:#eaf4ff;
+  --muted:#7c91ad;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+}
+
+/* === HEADER === */
+
+header{
+  text-align:center;
+  padding:14px;
+  background:#081a2c;
+  border-bottom:1px solid #143458;
+}
+
+h1{margin:0;font-size:20px;}
+
+small{color:var(--muted);}
+
+/* === LAYOUT === */
+
+main{
+  max-width:750px;
+  margin:auto;
+  padding:12px;
+}
+
+.card{
+  background:var(--card);
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:14px;
+  box-shadow:0 0 15px rgba(0,0,0,.5);
+}
+
+.hidden{display:none;}
+
+label{
+  display:block;
+  margin-top:10px;
+  font-size:14px;
+}
+
+input,select{
+  width:100%;
+  padding:10px;
+  margin-top:4px;
+  border:none;
+  border-radius:8px;
+  background:#162c46;
+  color:var(--text);
+}
+
+input[type=checkbox]{width:auto;}
+
+button{
+  width:100%;
+  padding:12px;
+  margin-top:12px;
+  border:none;
+  border-radius:10px;
+  font-weight:600;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#001018;
+}
+
+/* === NAV === */
+
+.nav{
+  display:flex;
+  gap:6px;
+}
+
+.tab{
+  flex:1;
+  text-align:center;
+  padding:8px;
+  border-radius:8px;
+  background:#162c46;
+  font-size:13px;
+}
+
+.tab.active{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#001018;
+}
+
+/* === LIST === */
+
+.item{
+  border-bottom:1px solid #1b3a5d;
+  padding:8px 0;
+}
+
+.done{opacity:.4;}
+
+.flex{
+  display:flex;
+  gap:8px;
+}
+
+/* === CONFIRM === */
+
+.confirm{
+  background:#091c2e;
+  border:1px solid var(--warn);
+  padding:12px;
+  border-radius:10px;
+  margin-top:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🕶️ NIGHTSHIFT</h1>
+  <small id="today"></small>
+</header>
+
+<main>
+
+<!-- NAV -->
+
+<div class="card nav">
+  <div class="tab active" onclick="nav('mission',this)">🎯 Mission</div>
+  <div class="tab" onclick="nav('call',this)">📞 Appel</div>
+  <div class="tab" onclick="nav('plan',this)">🗓 Planning</div>
+  <div class="tab" onclick="nav('log',this)">📋 Journal</div>
+</div>
+
+
+<!-- MISSION -->
+
+<div class="card" id="mission">
+
+<h3>🎯 Mission</h3>
+
+<label>Photo bracelet</label>
+<input type="file" accept="image/*" capture="environment">
+
+<label>Patient</label>
+<input id="m_patient">
+
+<label>Départ</label>
+<input id="m_from">
+
+<label>Destination</label>
+<input id="m_to">
+
+<label>Chambre</label>
+<input id="m_room">
+
+<label>Mode</label>
+<select id="m_mode">
+<option>Assis</option>
+<option>Couché</option>
+<option>Debout</option>
+</select>
+
+<label>Type transport</label>
+<select id="m_type">
+<option>Aller</option>
+<option>Retour</option>
+<option>Aller / Retour</option>
+</select>
+
+<label>Brancardier 1</label>
+<input id="m_b1">
+
+<label>Brancardier 2</label>
+<input id="m_b2">
+
+<button onclick="prepareConfirm()">Valider</button>
+
+<div class="confirm hidden" id="confirmBox">
+
+<p>Confirmer la mission ?</p>
+
+<button onclick="finishMission()" style="background:var(--ok)">Oui</button>
+<button onclick="cancelConfirm()">Non</button>
+
+</div>
+
+</div>
+
+
+<!-- CALL -->
+
+<div class="card hidden" id="call">
+
+<h3>📞 Nouvel appel</h3>
+
+<label>Heure</label>
+<input type="time" id="c_time">
+
+<label>Patient</label>
+<input id="c_patient">
+
+<label>Départ</label>
+<input id="c_from">
+
+<label>Destination</label>
+<input id="c_to">
+
+<label>Chambre</label>
+<input id="c_room">
+
+<button onclick="addCall()">Ajouter</button>
+
+</div>
+
+
+<!-- PLANNING -->
+
+<div class="card hidden" id="plan">
+
+<h3>🗓 Planning</h3>
+
+<div id="planList"></div>
+
+</div>
+
+
+<!-- JOURNAL -->
+
+<div class="card hidden" id="log">
+
+<h3>📋 Journal</h3>
+
+<div id="logList"></div>
+
+</div>
+
+
+</main>
+
+
+<script>
+
+/* === STORAGE === */
+
+let planning = JSON.parse(localStorage.getItem("ns_plan")||"[]");
+let journal  = JSON.parse(localStorage.getItem("ns_log")||"[]");
+
+/* === DATE === */
+
+function today(){
+  return new Date().toISOString().split("T")[0];
+}
+
+document.getElementById("today").textContent=today();
+
+
+/* === NAV === */
+
+function nav(id,el){
+
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  el.classList.add("active");
+
+  ["mission","call","plan","log"].forEach(v=>{
+    document.getElementById(v).classList.add("hidden");
+  });
+
+  document.getElementById(id).classList.remove("hidden");
+}
+
+
+/* === CALL === */
+
+function addCall(){
+
+  planning.push({
+    id:Date.now(),
+    date:today(),
+    time:c_time.value,
+    patient:c_patient.value,
+    from:c_from.value,
+    to:c_to.value,
+    room:c_room.value,
+    done:false
+  });
+
+  save();
+  clearCall();
+  render();
+  nav("plan",document.querySelectorAll(".tab")[2]);
+}
+
+function clearCall(){
+  ["c_time","c_patient","c_from","c_to","c_room"]
+  .forEach(i=>document.getElementById(i).value="");
+}
+
+
+/* === RENDER === */
+
+function render(){
+
+  planning.sort((a,b)=>{
+    if(!a.time) return 1;
+    if(!b.time) return -1;
+    return a.time.localeCompare(b.time);
+  });
+
+  planList.innerHTML="";
+
+  planning.filter(p=>p.date===today())
+  .forEach(p=>{
+
+    planList.innerHTML+=`
+    <div class="item ${p.done?"done":""}">
+    <strong>${p.time||"--:--"}</strong> ${p.patient}
+    <div class="muted">${p.from} → ${p.to} • ${p.room}</div>
+    </div>`;
+  });
+
+  logList.innerHTML="";
+
+  journal.filter(j=>j.date===today())
+  .forEach(j=>{
+
+    logList.innerHTML+=`
+    <div class="item">
+    <strong>${j.time}</strong> ${j.patient}
+    <div class="muted">
+    ${j.from} → ${j.to}
+    • ${j.room}
+    • ${j.mode}
+    • ${j.b1} ${j.b2}
+    • ${j.type}
+    </div>
+    </div>`;
+  });
+
+}
+
+
+/* === MISSION === */
+
+function prepareConfirm(){
+  document.getElementById("confirmBox").classList.remove("hidden");
+}
+
+function cancelConfirm(){
+  document.getElementById("confirmBox").classList.add("hidden");
+}
+
+
+function finishMission(){
+
+  const m={
+    date:today(),
+    time:new Date().toLocaleTimeString(),
+    patient:m_patient.value,
+    from:m_from.value,
+    to:m_to.value,
+    room:m_room.value,
+    mode:m_mode.value,
+    b1:m_b1.value,
+    b2:m_b2.value,
+    type:m_type.value
+  };
+
+  journal.push(m);
+
+  save();
+  clearMission();
+  render();
+  cancelConfirm();
+}
+
+
+/* === CLEAR === */
+
+function clearMission(){
+
+  ["m_patient","m_from","m_to","m_room","m_b1","m_b2"]
+  .forEach(i=>document.getElementById(i).value="");
+
+}
+
+
+/* === STORAGE === */
+
+function save(){
+  localStorage.setItem("ns_plan",JSON.stringify(planning));
+  localStorage.setItem("ns_log",JSON.stringify(journal));
+}
+
+
+/* === INIT === */
+
+render();
+
+</script>
+
+</body>
+</html>
+
