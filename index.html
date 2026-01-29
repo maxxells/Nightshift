@@ -376,7 +376,7 @@ function render(){
 
     planList.innerHTML+=`
     <div class="item ${p.done?"done":""}">
-    <strong>${p.time||"--:--"}</strong> ${p.nom || ""} ${p.prenom || ""}
+    <strong>${p.time||"--:--"}</strong> ${p.patient || (p.nom+" "+p.prenom)}
     <div class="muted">${p.from} → ${p.to} • ${p.room}</div>
     </div>`;
   });
