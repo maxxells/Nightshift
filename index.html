@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 <html lang="fr">
-<!-- OCR -->
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <head>
   <!-- PWA / iOS Icons -->
 <link rel="apple-touch-icon" href="192.png">
@@ -155,6 +153,7 @@ button{
 }
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 
 
@@ -183,8 +182,7 @@ button{
 
 <h3>🎯 Mission</h3>
 
-<label>Photo bracelet</label>
-<input type="file" accept="image/*" capture="environment">
+
 
 <label>Nom</label>
 <input id="p_nom">
@@ -216,7 +214,7 @@ button{
 <input id="m_to">
 
 <label>Chambre</label>
-<input id="m_room">
+<input type="number" inputmode="numeric" pattern="[0-9]*" id="m_room">
 
 <label>Mode</label>
 <select id="m_mode">
@@ -378,7 +376,7 @@ function render(){
 
     planList.innerHTML+=`
     <div class="item ${p.done?"done":""}">
-    <strong>${p.time||"--:--"}</strong> ${p.patient}
+    <strong>${p.time||"--:--"}</strong> ${p.nom || ""} ${p.prenom || ""}
     <div class="muted">${p.from} → ${p.to} • ${p.room}</div>
     </div>`;
   });
@@ -390,9 +388,9 @@ function render(){
 
     logList.innerHTML+=`
     <div class="item">
-    <strong>${j.time}</strong> ${j.patient}
+    <strong>${j
     <div class="muted">
-    ${j.from} → ${j.to}
+    <strong>${j.time}</strong> ${j.nom} ${j.prenom}
     • ${j.room}
     • ${j.mode}
     • ${j.b1} ${j.b2}
