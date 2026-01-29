@@ -182,6 +182,10 @@ button{
 
 <h3>🎯 Mission</h3>
 
+<label>Scanner bracelet</label>
+<input type="file" accept="image/*" capture="environment" id="scan">
+
+<button onclick="scanBracelet()">📸 Scanner</button>
 
 
 <label>Nom</label>
@@ -201,11 +205,6 @@ button{
 
 <label>N° dossier (optionnel)</label>
 <input type="number" inputmode="numeric" id="p_dossier">
-
-<label>Scanner bracelet</label>
-<input type="file" accept="image/*" capture="environment" id="scan">
-
-<button onclick="scanBracelet()">📸 Scanner</button>
 
 <label>Départ</label>
 <input id="m_from">
@@ -481,13 +480,21 @@ async function scanBracelet(){
     return;
   }
 
+  const img = await preprocessImage(file);
+
   const result = await Tesseract.recognize(
-    file,
+    img,
     "fra",
-    { logger: m => console.log(m) }
+    {
+      tessedit_char_whitelist:
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789()/ :",
+      logger: m => console.log(m)
+    }
   );
 
   const text = result.data.text;
+
+  console.log("OCR brut:", text);
 
   parseBracelet(text);
 }
