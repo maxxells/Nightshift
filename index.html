@@ -216,10 +216,10 @@ button{
 <input type="number" inputmode="numeric" pattern="[0-9]*" id="m_room">
 
 <label>Mode</label>
-<input id="m_from">
-<option>Assis</option>
-<option>Couché</option>
-<option>Debout</option>
+<select id="m_mode">
+  <option>Assis</option>
+  <option>Couché</option>
+  <option>Debout</option>
 </select>
 
 <label>Type transport</label>
@@ -230,9 +230,10 @@ button{
 </select>
 
 <label>Brancardier 1</label>
-<select id="m_to"></select>
+<select id="m_b1"></select>
+
 <label>Brancardier 2</label>
-<select id="m_to"></select>
+<select id="m_b2"></select>
 <button onclick="prepareConfirm()">Valider</button>
 
 <div class="confirm hidden" id="confirmBox">
@@ -292,6 +293,28 @@ button{
 <div id="logList"></div>
 
 </div>
+<!-- PARAMETRES -->
+
+<div class="card hidden" id="settings">
+
+<h3>⚙️ Paramètres</h3>
+
+<h4>Départs</h4>
+<input id="set_from">
+<button onclick="addSetting('from')">Ajouter</button>
+<div id="list_from"></div>
+
+<h4>Destinations</h4>
+<input id="set_to">
+<button onclick="addSetting('to')">Ajouter</button>
+<div id="list_to"></div>
+
+<h4>Brancardiers</h4>
+<input id="set_staff">
+<button onclick="addSetting('staff')">Ajouter</button>
+<div id="list_staff"></div>
+
+</div>
 
 
 </main>
@@ -335,28 +358,6 @@ function fill(id,list){
   });
 }
  
-<!-- PARAMETRES -->
-
-<div class="card hidden" id="settings">
-
-<h3>⚙️ Paramètres</h3>
-
-<h4>Départs</h4>
-<input id="set_from">
-<button onclick="addSetting('from')">Ajouter</button>
-<div id="list_from"></div>
-
-<h4>Destinations</h4>
-<input id="set_to">
-<button onclick="addSetting('to')">Ajouter</button>
-<div id="list_to"></div>
-
-<h4>Brancardiers</h4>
-<input id="set_staff">
-<button onclick="addSetting('staff')">Ajouter</button>
-<div id="list_staff"></div>
-
-</div>
 
 /* === STORAGE === */
 
@@ -526,7 +527,7 @@ function save(){
 render();
 loadSettings();
   
-loadLists();
+
 
   /* === IMAGE PREPROCESS === */
 
@@ -637,13 +638,7 @@ function parseBracelet(txt){
   if(dossier) p_dossier.value = dossier[0];
 
 }
- /* === SETTINGS === */
 
-let settings = JSON.parse(localStorage.getItem("ns_settings")) || {
-  from: ["Urgences","Accueil","Chambre"],
-  to: ["Bloc","Radio","IRM","Scanner"],
-  staff: ["Jean","Paul"]
-};
 
 
 function saveSettings(){
