@@ -207,16 +207,14 @@ button{
 <input type="number" inputmode="numeric" id="p_dossier">
 
 <label>Départ</label>
-<input id="m_from">
-
+<select id="m_from"></select>
 <label>Destination</label>
-<input id="m_to">
-
+<select id="m_to"></select>
 <label>Chambre</label>
 <input type="number" inputmode="numeric" pattern="[0-9]*" id="m_room">
 
 <label>Mode</label>
-<select id="m_mode">
+<input id="m_from">
 <option>Assis</option>
 <option>Couché</option>
 <option>Debout</option>
@@ -230,11 +228,9 @@ button{
 </select>
 
 <label>Brancardier 1</label>
-<input id="m_b1">
-
+<select id="m_to"></select>
 <label>Brancardier 2</label>
-<input id="m_b2">
-
+<select id="m_to"></select>
 <button onclick="prepareConfirm()">Valider</button>
 
 <div class="confirm hidden" id="confirmBox">
@@ -268,7 +264,8 @@ button{
 <input id="c_to">
 
 <label>Chambre</label>
-<input id="c_room">
+<input type="number" inputmode="numeric" pattern="[0-9]*" id="c_room">
+
 
 <button onclick="addCall()">Ajouter</button>
 
