@@ -381,23 +381,21 @@ function render(){
     </div>`;
   });
 
-  logList.innerHTML="";
-
   journal.filter(j=>j.date===today())
-  .forEach(j=>{
+.forEach(j=>{
 
-    logList.innerHTML+=`
-    <div class="item">
-    <strong>${j
-    <div class="muted">
+  logList.innerHTML+=`
+  <div class="item">
     <strong>${j.time}</strong> ${j.nom} ${j.prenom}
-    • ${j.room}
-    • ${j.mode}
-    • ${j.b1} ${j.b2}
-    • ${j.type}
+    <div class="muted">
+      ${j.from} → ${j.to}
+      • ${j.room}
+      • ${j.mode}
+      • ${j.b1} ${j.b2}
+      • ${j.type}
     </div>
-    </div>`;
-  });
+  </div>`;
+});
 
 }
 
@@ -446,8 +444,16 @@ dossier:p_dossier.value,
 
 function clearMission(){
 
-  ["m_patient","m_from","m_to","m_room","m_b1","m_b2"]
-  .forEach(i=>document.getElementById(i).value="");
+[
+"p_nom","p_prenom","p_naissance","p_sexe",
+"p_ipp","p_dossier",
+"m_from","m_to","m_room","m_b1","m_b2"
+]
+.forEach(i=>{
+  const el=document.getElementById(i);
+  if(el) el.value="";
+});
+
 
 }
 
