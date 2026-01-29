@@ -469,6 +469,50 @@ function save(){
 
 render();
 
+  /* === IMAGE PREPROCESS === */
+
+function preprocessImage(file){
+
+  return new Promise(resolve=>{
+
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = e=>{
+      img.src = e.target.result;
+    };
+
+    img.onload = ()=>{
+
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      ctx.drawImage(img,0,0);
+
+      const data = ctx.getImageData(0,0,canvas.width,canvas.height);
+      const d = data.data;
+
+      for(let i=0;i<d.length;i+=4){
+
+        const avg = (d[i]+d[i+1]+d[i+2])/3;
+
+        const v = avg > 140 ? 255 : 0;
+
+        d[i]=d[i+1]=d[i+2]=v;
+      }
+
+      ctx.putImageData(data,0,0);
+
+      resolve(canvas);
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
   /* === OCR === */
 
 async function scanBracelet(){
@@ -502,39 +546,38 @@ async function scanBracelet(){
 
 /* === PARSING === */
 
+  
 function parseBracelet(txt){
 
-  let lines = txt
-    .split("\n")
-    .map(l=>l.trim())
-    .filter(l=>l);
+  txt = txt.replace(/\s+/g," ");
 
-  console.log(lines);
+  console.log("Nettoyé:",txt);
 
-  // Nom / Prenom
-  if(lines.length>=2){
-    p_nom.value = lines[0];
-    p_prenom.value = lines[1];
+  // NOM + PRENOM
+  const nameMatch = txt.match(/([A-Z]{3,}) ([A-Z]{3,})/);
+
+  if(nameMatch){
+    p_nom.value = nameMatch[1];
+    p_prenom.value = nameMatch[2];
   }
 
-  // Date naissance
+  // DATE NAISSANCE
   const birth = txt.match(/\d{2}\/\d{2}\/\d{4}/);
   if(birth) p_naissance.value = birth[0];
 
-  // Sexe
+  // SEXE
   const sex = txt.match(/\((M|F)\)/);
   if(sex) p_sexe.value = sex[1];
 
   // IPP
-  const ipp = txt.match(/IPP[: ]*([0-9]{6,10})/i);
+  const ipp = txt.match(/IPP[: ]*([0-9]{6,12})/i);
   if(ipp) p_ipp.value = ipp[1];
 
-  // Dossier (7-9 chiffres)
-  const dossier = txt.match(/\b\d{7,9}\b/);
+  // DOSSIER
+  const dossier = txt.match(/\b3\d{7,8}\b/);
   if(dossier) p_dossier.value = dossier[0];
 
 }
-
 </script>
 
 </body>
