@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
+<!-- OCR -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <head>
   <!-- PWA / iOS Icons -->
 <link rel="apple-touch-icon" href="192.png">
 <link rel="apple-touch-icon" sizes="512x512" href="512.png">
@@ -184,8 +186,28 @@ button{
 <label>Photo bracelet</label>
 <input type="file" accept="image/*" capture="environment">
 
-<label>Patient</label>
-<input id="m_patient">
+<label>Nom</label>
+<input id="p_nom">
+
+<label>Prénom</label>
+<input id="p_prenom">
+
+<label>Date de naissance</label>
+<input id="p_naissance" placeholder="JJ/MM/AAAA">
+
+<label>Sexe</label>
+<input id="p_sexe" placeholder="M / F">
+
+<label>IPP (optionnel)</label>
+<input type="number" inputmode="numeric" id="p_ipp">
+
+<label>N° dossier (optionnel)</label>
+<input type="number" inputmode="numeric" id="p_dossier">
+
+<label>Scanner bracelet</label>
+<input type="file" accept="image/*" capture="environment" id="scan">
+
+<button onclick="scanBracelet()">📸 Scanner</button>
 
 <label>Départ</label>
 <input id="m_from">
@@ -398,7 +420,12 @@ function finishMission(){
   const m={
     date:today(),
     time:new Date().toLocaleTimeString(),
-    patient:m_patient.value,
+    nom:p_nom.value,
+prenom:p_prenom.value,
+naissance:p_naissance.value,
+sexe:p_sexe.value,
+ipp:p_ipp.value,
+dossier:p_dossier.value,
     from:m_from.value,
     to:m_to.value,
     room:m_room.value,
@@ -438,6 +465,64 @@ function save(){
 /* === INIT === */
 
 render();
+
+  /* === OCR === */
+
+async function scanBracelet(){
+
+  const file = document.getElementById("scan").files[0];
+
+  if(!file){
+    alert("Prends une photo du bracelet");
+    return;
+  }
+
+  const result = await Tesseract.recognize(
+    file,
+    "fra",
+    { logger: m => console.log(m) }
+  );
+
+  const text = result.data.text;
+
+  parseBracelet(text);
+}
+
+
+/* === PARSING === */
+
+function parseBracelet(txt){
+
+  let lines = txt
+    .split("\n")
+    .map(l=>l.trim())
+    .filter(l=>l);
+
+  console.log(lines);
+
+  // Nom / Prenom
+  if(lines.length>=2){
+    p_nom.value = lines[0];
+    p_prenom.value = lines[1];
+  }
+
+  // Date naissance
+  const birth = txt.match(/\d{2}\/\d{2}\/\d{4}/);
+  if(birth) p_naissance.value = birth[0];
+
+  // Sexe
+  const sex = txt.match(/\((M|F)\)/);
+  if(sex) p_sexe.value = sex[1];
+
+  // IPP
+  const ipp = txt.match(/IPP[: ]*([0-9]{6,10})/i);
+  if(ipp) p_ipp.value = ipp[1];
+
+  // Dossier (7-9 chiffres)
+  const dossier = txt.match(/\b\d{7,9}\b/);
+  if(dossier) p_dossier.value = dossier[0];
+
+}
 
 </script>
 
