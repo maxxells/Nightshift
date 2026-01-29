@@ -173,7 +173,9 @@ button{
   <div class="tab" onclick="nav('call',this)">📞 Appel</div>
   <div class="tab" onclick="nav('plan',this)">🗓 Planning</div>
   <div class="tab" onclick="nav('log',this)">📋 Journal</div>
+  <div class="tab" onclick="nav('settings',this)">⚙️ Paramètres</div>
 </div>
+
 
 
 <!-- MISSION -->
@@ -258,11 +260,9 @@ button{
 <input id="c_patient">
 
 <label>Départ</label>
-<input id="c_from">
-
+<select id="c_from"></select>
 <label>Destination</label>
-<input id="c_to">
-
+<select id="c_to"></select>
 <label>Chambre</label>
 <input type="number" inputmode="numeric" pattern="[0-9]*" id="c_room">
 
@@ -298,6 +298,63 @@ button{
 
 
 <script>
+let settings = JSON.parse(localStorage.getItem("ns_settings") || `
+{
+  "from": ["Urgences","IRM","Scanner","Radio"],
+  "to": ["Bloc","Radio","IRM","Urgences"],
+  "staff": ["Jean-no","Claude","Jacques"]
+}
+`);
+function saveSettings(){
+  localStorage.setItem("ns_settings", JSON.stringify(settings));
+}
+
+ function loadLists(){
+
+  fill("m_from", settings.from);
+  fill("c_from", settings.from);
+
+  fill("m_to", settings.to);
+  fill("c_to", settings.to);
+
+  fill("m_b1", settings.staff);
+  fill("m_b2", settings.staff);
+}
+
+function fill(id,list){
+
+  const el = document.getElementById(id);
+  if(!el) return;
+
+  el.innerHTML = `<option value="">-- Choisir --</option>`;
+
+  list.forEach(v=>{
+    el.innerHTML += `<option>${v}</option>`;
+  });
+}
+ 
+<!-- PARAMETRES -->
+
+<div class="card hidden" id="settings">
+
+<h3>⚙️ Paramètres</h3>
+
+<h4>Départs</h4>
+<input id="set_from">
+<button onclick="addSetting('from')">Ajouter</button>
+<div id="list_from"></div>
+
+<h4>Destinations</h4>
+<input id="set_to">
+<button onclick="addSetting('to')">Ajouter</button>
+<div id="list_to"></div>
+
+<h4>Brancardiers</h4>
+<input id="set_staff">
+<button onclick="addSetting('staff')">Ajouter</button>
+<div id="list_staff"></div>
+
+</div>
 
 /* === STORAGE === */
 
@@ -465,6 +522,7 @@ function save(){
 /* === INIT === */
 
 render();
+loadLists();
 
   /* === IMAGE PREPROCESS === */
 
@@ -575,6 +633,115 @@ function parseBracelet(txt){
   if(dossier) p_dossier.value = dossier[0];
 
 }
+ /* === SETTINGS === */
+
+let settings = JSON.parse(localStorage.getItem("ns_settings")) || {
+  from: ["Urgences","Accueil","Chambre"],
+  to: ["Bloc","Radio","IRM","Scanner"],
+  staff: ["Jean","Paul"]
+};
+
+
+function saveSettings(){
+  localStorage.setItem("ns_settings", JSON.stringify(settings));
+}
+
+
+function loadSettings(){
+
+  renderSettings();
+  loadLists();
+}
+
+
+function renderSettings(){
+
+  renderList("from","list_from","set_from");
+  renderList("to","list_to","set_to");
+  renderList("staff","list_staff","set_staff");
+
+}
+
+
+function renderList(key,container,input){
+
+  const box = document.getElementById(container);
+
+  box.innerHTML="";
+
+  settings[key].forEach((v,i)=>{
+
+    box.innerHTML += `
+      <div class="item">
+        ${v}
+        <button onclick="removeSetting('${key}',${i})">❌</button>
+      </div>
+    `;
+  });
+
+}
+
+
+function addSetting(key){
+
+  const map = {
+    from:"set_from",
+    to:"set_to",
+    staff:"set_staff"
+  };
+
+  const input = document.getElementById(map[key]);
+
+  if(!input.value) return;
+
+  settings[key].push(input.value);
+
+  input.value="";
+
+  saveSettings();
+  renderSettings();
+  loadLists();
+}
+
+
+function removeSetting(key,i){
+
+  settings[key].splice(i,1);
+
+  saveSettings();
+  renderSettings();
+  loadLists();
+}
+
+
+/* === SELECT LISTS === */
+
+function loadLists(){
+
+  fill("m_from",settings.from);
+  fill("c_from",settings.from);
+
+  fill("m_to",settings.to);
+  fill("c_to",settings.to);
+
+  fill("m_b1",settings.staff);
+  fill("m_b2",settings.staff);
+}
+
+
+function fill(id,list){
+
+  const el = document.getElementById(id);
+
+  if(!el) return;
+
+  el.innerHTML = `<option value="">-- Choisir --</option>`;
+
+  list.forEach(v=>{
+    el.innerHTML += `<option>${v}</option>`;
+  });
+}
+ 
 </script>
 
 </body>
