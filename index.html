@@ -619,24 +619,78 @@ function preprocessImage(file){
     reader.readAsDataURL(file);
   });
 }
+/* === IMAGE PREPROCESS === */
 
+function preprocessImage(file){
+
+  return new Promise(resolve=>{
+
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = e=>{
+      img.src = e.target.result;
+    };
+
+    img.onload = ()=>{
+
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      ctx.drawImage(img,0,0);
+
+      const data = ctx.getImageData(0,0,canvas.width,canvas.height);
+      const d = data.data;
+
+      for(let i=0;i<d.length;i+=4){
+
+        const avg = (d[i]+d[i+1]+d[i+2])/3;
+
+        const v = avg > 140 ? 255 : 0;
+
+        d[i]=d[i+1]=d[i+2]=v;
+      }
+
+      ctx.putImageData(data,0,0);
+
+      resolve(canvas);
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
 
 /* === OCR === */
 
 async function scanBracelet(){
 
-  const file=scan.files[0];
+  const file = document.getElementById("scan").files[0];
 
   if(!file){
-    alert("Photo manquante");
+    alert("Prends une photo du bracelet");
     return;
   }
 
-  const img=await preprocessImage(file);
+  const img = await preprocessImage(file);
 
-  const r=await Tesseract.recognize(img,"fra");
+  const result = await Tesseract.recognize(
+    img,
+    "fra",
+    {
+      tessedit_char_whitelist:
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789()/ :",
+      logger: m => console.log(m)
+    }
+  );
 
-  parseBracelet(r.data.text);
+  const text = result.data.text;
+
+  console.log("OCR brut:", text);
+
+  parseBracelet(text);
 }
 
 
@@ -644,28 +698,35 @@ async function scanBracelet(){
 
 function parseBracelet(txt){
 
-  txt=txt.replace(/\s+/g," ");
+  txt = txt.replace(/\s+/g," ");
 
-  const name=txt.match(/([A-Z]{3,}) ([A-Z]{3,})/);
+  console.log("Nettoyé:",txt);
 
-  if(name){
-    p_nom.value=name[1];
-    p_prenom.value=name[2];
+  // NOM + PRENOM
+  const nameMatch = txt.match(/([A-Z]{3,}) ([A-Z]{3,})/);
+
+  if(nameMatch){
+    p_nom.value = nameMatch[1];
+    p_prenom.value = nameMatch[2];
   }
 
-  const birth=txt.match(/\d{2}\/\d{2}\/\d{4}/);
-  if(birth) p_naissance.value=birth[0];
+  // DATE NAISSANCE
+  const birth = txt.match(/\d{2}\/\d{2}\/\d{4}/);
+  if(birth) p_naissance.value = birth[0];
 
-  const sex=txt.match(/\((M|F)\)/);
-  if(sex) p_sexe.value=sex[1];
+  // SEXE
+  const sex = txt.match(/\((M|F)\)/);
+  if(sex) p_sexe.value = sex[1];
 
-  const ipp=txt.match(/IPP[: ]*([0-9]+)/i);
-  if(ipp) p_ipp.value=ipp[1];
+  // IPP
+  const ipp = txt.match(/IPP[: ]*([0-9]{6,12})/i);
+  if(ipp) p_ipp.value = ipp[1];
 
-  const dos=txt.match(/\b3\d{7,8}\b/);
-  if(dos) p_dossier.value=dos[0];
+  // DOSSIER
+  const dossier = txt.match(/\b3\d{7,8}\b/);
+  if(dossier) p_dossier.value = dossier[0];
+
 }
-
 
 /* === INIT === */
 
