@@ -579,46 +579,7 @@ function fill(id,list){
 }
 
 
-/* === OCR PREPROCESS === */
 
-function preprocessImage(file){
-
-  return new Promise(resolve=>{
-
-    const img=new Image();
-    const reader=new FileReader();
-
-    reader.onload=e=>img.src=e.target.result;
-
-    img.onload=()=>{
-
-      const c=document.createElement("canvas");
-      const ctx=c.getContext("2d");
-
-      c.width=img.width;
-      c.height=img.height;
-
-      ctx.drawImage(img,0,0);
-
-      const d=ctx.getImageData(0,0,c.width,c.height);
-      const p=d.data;
-
-      for(let i=0;i<p.length;i+=4){
-
-        const a=(p[i]+p[i+1]+p[i+2])/3;
-        const v=a>140?255:0;
-
-        p[i]=p[i+1]=p[i+2]=v;
-      }
-
-      ctx.putImageData(d,0,0);
-
-      resolve(c);
-    };
-
-    reader.readAsDataURL(file);
-  });
-}
 /* === IMAGE PREPROCESS === */
 
 function preprocessImage(file){
@@ -642,19 +603,23 @@ function preprocessImage(file){
 
       ctx.drawImage(img,0,0);
 
-      const data = ctx.getImageData(0,0,canvas.width,canvas.height);
-      const d = data.data;
+      const image = ctx.getImageData(0,0,canvas.width,canvas.height);
+      const d = image.data;
 
       for(let i=0;i<d.length;i+=4){
 
-        const avg = (d[i]+d[i+1]+d[i+2])/3;
+        // Gris
+        let g = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
 
-        const v = avg > 140 ? 255 : 0;
+        // Boost contraste
+        g = g * 1.4;
 
-        d[i]=d[i+1]=d[i+2]=v;
+        if(g>255) g=255;
+
+        d[i]=d[i+1]=d[i+2]=g;
       }
 
-      ctx.putImageData(data,0,0);
+      ctx.putImageData(image,0,0);
 
       resolve(canvas);
     };
@@ -662,7 +627,6 @@ function preprocessImage(file){
     reader.readAsDataURL(file);
   });
 }
-
 /* === OCR === */
 
 async function scanBracelet(){
@@ -677,14 +641,13 @@ async function scanBracelet(){
   const img = await preprocessImage(file);
 
   const result = await Tesseract.recognize(
-    img,
-    "fra",
     {
-      tessedit_char_whitelist:
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789()/ :",
-      logger: m => console.log(m)
-    }
-  );
+  tessedit_char_whitelist:
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789()/ :-",
+  preserve_interword_spaces: 1,
+  tessedit_pageseg_mode: 6,
+  logger: m => console.log(m)
+}
 
   const text = result.data.text;
 
