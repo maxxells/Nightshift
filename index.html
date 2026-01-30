@@ -625,12 +625,32 @@ function preprocessImage(file){
 
 async function scanBracelet(){
 
-  const file=scan.files[0];
+  const file = scan.files[0];
 
   if(!file){
-    alert("Photo manquante");
+    alert("Prends une photo du bracelet");
     return;
   }
+
+  const img = await preprocessImage(file);
+
+  const result = await Tesseract.recognize(
+    img,
+    "fra",
+    {
+      tessedit_char_whitelist:
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789()/ :",
+      preserve_interword_spaces: 1,
+      logger: m => console.log(m)
+    }
+  );
+
+  const text = result.data.text;
+
+  console.log("OCR brut :", text);
+
+  parseBracelet(text);
+}
 
   const img=await preprocessImage(file);
 
