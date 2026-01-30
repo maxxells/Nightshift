@@ -618,6 +618,10 @@ function preprocessImage(file){
         g = Math.max(0, Math.min(255, g));
 
         d[i]=d[i+1]=d[i+2]=g;
+        // Netteté légère
+d[i] = Math.min(255, d[i] * 1.15);
+d[i+1] = Math.min(255, d[i+1] * 1.15);
+d[i+2] = Math.min(255, d[i+2] * 1.15);
       }
 
       ctx.putImageData(image,0,0);
@@ -643,7 +647,7 @@ async function scanBracelet(){
 
   const result = await Tesseract.recognize(
     img,
-    "fra",
+    "fra+eng",
     {
       tessedit_char_whitelist:
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789()/ :-",
@@ -669,7 +673,7 @@ function parseBracelet(txt){
   console.log("Nettoyé:",txt);
 
   // NOM + PRENOM
-  const nameMatch = txt.match(/([A-Z]{3,}) ([A-Z]{3,})/);
+  const nameMatch = txt.match(/([A-Z]{2,})\s+([A-Z]{2,})/);
 
   if(nameMatch){
     p_nom.value = nameMatch[1];
