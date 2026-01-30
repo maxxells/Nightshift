@@ -1,31 +1,20 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-  <!-- PWA / iOS Icons -->
-<link rel="apple-touch-icon" href="192.png">
-<link rel="apple-touch-icon" sizes="512x512" href="512.png">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Nightshift">
+<head>
 
 <meta charset="UTF-8">
-<title>Nightshift V2.1</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nightshift</title>
+
+<!-- PWA -->
+<link rel="apple-touch-icon" href="192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="512.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<!-- OCR -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
-
-/* === FRACTAL BACKGROUND (SVG) === */
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(circle at 20% 30%, rgba(0,200,180,.15), transparent 40%),
-    radial-gradient(circle at 80% 60%, rgba(0,120,255,.15), transparent 40%),
-    radial-gradient(circle at 50% 80%, rgba(0,180,120,.12), transparent 50%);
-  z-index:-1;
-}
 
 /* === THEME === */
 
@@ -47,7 +36,20 @@ body{
   font-family:-apple-system,BlinkMacSystemFont,sans-serif;
 }
 
-/* === HEADER === */
+/* Background */
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(0,200,180,.15), transparent 40%),
+    radial-gradient(circle at 80% 60%, rgba(0,120,255,.15), transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(0,180,120,.12), transparent 50%);
+  z-index:-1;
+}
+
+/* Header */
 
 header{
   text-align:center;
@@ -56,11 +58,7 @@ header{
   border-bottom:1px solid #143458;
 }
 
-h1{margin:0;font-size:20px;}
-
-small{color:var(--muted);}
-
-/* === LAYOUT === */
+/* Layout */
 
 main{
   max-width:750px;
@@ -73,7 +71,7 @@ main{
   border-radius:14px;
   padding:14px;
   margin-bottom:14px;
-  box-shadow:0 0 15px rgba(0,0,0,.5);
+  box-shadow:0 0 15px rgba(0,0,0,.4);
 }
 
 .hidden{display:none;}
@@ -81,7 +79,6 @@ main{
 label{
   display:block;
   margin-top:10px;
-  font-size:14px;
 }
 
 input,select{
@@ -94,8 +91,6 @@ input,select{
   color:var(--text);
 }
 
-input[type=checkbox]{width:auto;}
-
 button{
   width:100%;
   padding:12px;
@@ -107,7 +102,7 @@ button{
   color:#001018;
 }
 
-/* === NAV === */
+/* Nav */
 
 .nav{
   display:flex;
@@ -128,7 +123,7 @@ button{
   color:#001018;
 }
 
-/* === LIST === */
+/* Lists */
 
 .item{
   border-bottom:1px solid #1b3a5d;
@@ -136,13 +131,6 @@ button{
 }
 
 .done{opacity:.4;}
-
-.flex{
-  display:flex;
-  gap:8px;
-}
-
-/* === CONFIRM === */
 
 .confirm{
   background:#091c2e;
@@ -153,14 +141,12 @@ button{
 }
 
 </style>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
-
 
 <body>
 
 <header>
-  <h1>🕶️ NIGHTSHIFT</h1>
+  <h2>🕶️ NIGHTSHIFT</h2>
   <small id="today"></small>
 </header>
 
@@ -177,7 +163,6 @@ button{
 </div>
 
 
-
 <!-- MISSION -->
 
 <div class="card" id="mission">
@@ -186,9 +171,7 @@ button{
 
 <label>Scanner bracelet</label>
 <input type="file" accept="image/*" capture="environment" id="scan">
-
 <button onclick="scanBracelet()">📸 Scanner</button>
-
 
 <label>Nom</label>
 <input id="p_nom">
@@ -196,24 +179,26 @@ button{
 <label>Prénom</label>
 <input id="p_prenom">
 
-<label>Date de naissance</label>
-<input id="p_naissance" placeholder="JJ/MM/AAAA">
+<label>Date naissance</label>
+<input id="p_naissance">
 
 <label>Sexe</label>
-<input id="p_sexe" placeholder="M / F">
+<input id="p_sexe">
 
-<label>IPP (optionnel)</label>
+<label>IPP</label>
 <input type="number" inputmode="numeric" id="p_ipp">
 
-<label>N° dossier (optionnel)</label>
+<label>Dossier</label>
 <input type="number" inputmode="numeric" id="p_dossier">
 
 <label>Départ</label>
 <select id="m_from"></select>
+
 <label>Destination</label>
 <select id="m_to"></select>
+
 <label>Chambre</label>
-<input type="number" inputmode="numeric" pattern="[0-9]*" id="m_room">
+<input type="number" inputmode="numeric" id="m_room">
 
 <label>Mode</label>
 <select id="m_mode">
@@ -222,11 +207,11 @@ button{
   <option>Debout</option>
 </select>
 
-<label>Type transport</label>
+<label>Type</label>
 <select id="m_type">
-<option>Aller</option>
-<option>Retour</option>
-<option>Aller / Retour</option>
+  <option>Aller</option>
+  <option>Retour</option>
+  <option>Aller / Retour</option>
 </select>
 
 <label>Brancardier 1</label>
@@ -234,11 +219,12 @@ button{
 
 <label>Brancardier 2</label>
 <select id="m_b2"></select>
+
 <button onclick="prepareConfirm()">Valider</button>
 
-<div class="confirm hidden" id="confirmBox">
+<div id="confirmBox" class="confirm hidden">
 
-<p>Confirmer la mission ?</p>
+<p>Confirmer ?</p>
 
 <button onclick="finishMission()" style="background:var(--ok)">Oui</button>
 <button onclick="cancelConfirm()">Non</button>
@@ -262,11 +248,12 @@ button{
 
 <label>Départ</label>
 <select id="c_from"></select>
+
 <label>Destination</label>
 <select id="c_to"></select>
-<label>Chambre</label>
-<input type="number" inputmode="numeric" pattern="[0-9]*" id="c_room">
 
+<label>Chambre</label>
+<input type="number" inputmode="numeric" id="c_room">
 
 <button onclick="addCall()">Ajouter</button>
 
@@ -278,7 +265,6 @@ button{
 <div class="card hidden" id="plan">
 
 <h3>🗓 Planning</h3>
-
 <div id="planList"></div>
 
 </div>
@@ -289,11 +275,12 @@ button{
 <div class="card hidden" id="log">
 
 <h3>📋 Journal</h3>
-
 <div id="logList"></div>
 
 </div>
-<!-- PARAMETRES -->
+
+
+<!-- SETTINGS -->
 
 <div class="card hidden" id="settings">
 
@@ -316,53 +303,22 @@ button{
 
 </div>
 
-
 </main>
 
 
 <script>
-  alert("JS démarre");
 
-let settings = JSON.parse(localStorage.getItem("ns_settings") || `
-{
-  "from": ["Urgences","IRM","Scanner","Radio"],
-  "to": ["Bloc","Radio","IRM","Urgences"],
-  "staff": ["Jean-no","Claude","Jacques"]
-}
-`);
-function saveSettings(){
-  localStorage.setItem("ns_settings", JSON.stringify(settings));
-}
-
- function loadLists(){
-
-  fill("m_from", settings.from);
-  fill("c_from", settings.from);
-
-  fill("m_to", settings.to);
-  fill("c_to", settings.to);
-
-  fill("m_b1", settings.staff);
-  fill("m_b2", settings.staff);
-}
-
-function fill(id,list){
-
-  const el = document.getElementById(id);
-  if(!el) return;
-
-  el.innerHTML = `<option value="">-- Choisir --</option>`;
-
-  list.forEach(v=>{
-    el.innerHTML += `<option>${v}</option>`;
-  });
-}
- 
-
-/* === STORAGE === */
+/* === DATA === */
 
 let planning = JSON.parse(localStorage.getItem("ns_plan")||"[]");
 let journal  = JSON.parse(localStorage.getItem("ns_log")||"[]");
+
+let settings = JSON.parse(localStorage.getItem("ns_settings")) || {
+  from:["Urgences","IRM","Scanner"],
+  to:["Bloc","Radio","Chambre"],
+  staff:["Jean","Paul"]
+};
+
 
 /* === DATE === */
 
@@ -370,7 +326,8 @@ function today(){
   return new Date().toISOString().split("T")[0];
 }
 
-document.getElementById("today").textContent=today();
+todayEl = document.getElementById("today");
+todayEl.textContent = today();
 
 
 /* === NAV === */
@@ -380,7 +337,7 @@ function nav(id,el){
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
   el.classList.add("active");
 
-  ["mission","call","plan","log"].forEach(v=>{
+  ["mission","call","plan","log","settings"].forEach(v=>{
     document.getElementById(v).classList.add("hidden");
   });
 
@@ -409,8 +366,10 @@ function addCall(){
   nav("plan",document.querySelectorAll(".tab")[2]);
 }
 
+
 function clearCall(){
-  ["c_time","c_patient","c_from","c_to","c_room"]
+
+  ["c_time","c_patient","c_room"]
   .forEach(i=>document.getElementById(i).value="");
 }
 
@@ -419,39 +378,42 @@ function clearCall(){
 
 function render(){
 
-  planning.sort((a,b)=>{
-    if(!a.time) return 1;
-    if(!b.time) return -1;
-    return a.time.localeCompare(b.time);
-  });
-
   planList.innerHTML="";
+  logList.innerHTML="";
 
-  planning.filter(p=>p.date===today())
+  planning
+  .filter(p=>p.date===today())
+  .sort((a,b)=>a.time.localeCompare(b.time))
   .forEach(p=>{
 
     planList.innerHTML+=`
     <div class="item ${p.done?"done":""}">
-    <strong>${p.time||"--:--"}</strong> ${p.patient || (p.nom+" "+p.prenom)}
-    <div class="muted">${p.from} → ${p.to} • ${p.room}</div>
+      <strong>${p.time||"--:--"}</strong>
+      ${p.patient}
+      <div class="muted">
+      ${p.from} → ${p.to} • ${p.room}
+      </div>
     </div>`;
   });
 
-  journal.filter(j=>j.date===today())
-.forEach(j=>{
 
-  logList.innerHTML+=`
-  <div class="item">
-    <strong>${j.time}</strong> ${j.nom} ${j.prenom}
-    <div class="muted">
+  journal
+  .filter(j=>j.date===today())
+  .forEach(j=>{
+
+    logList.innerHTML+=`
+    <div class="item">
+      <strong>${j.time}</strong>
+      ${j.nom} ${j.prenom}
+      <div class="muted">
       ${j.from} → ${j.to}
       • ${j.room}
       • ${j.mode}
       • ${j.b1} ${j.b2}
       • ${j.type}
-    </div>
-  </div>`;
-});
+      </div>
+    </div>`;
+  });
 
 }
 
@@ -459,31 +421,36 @@ function render(){
 /* === MISSION === */
 
 function prepareConfirm(){
-  document.getElementById("confirmBox").classList.remove("hidden");
+  confirmBox.classList.remove("hidden");
 }
 
 function cancelConfirm(){
-  document.getElementById("confirmBox").classList.add("hidden");
+  confirmBox.classList.add("hidden");
 }
 
 
 function finishMission(){
 
-  const m={
+  const m = {
+
     date:today(),
     time:new Date().toLocaleTimeString(),
+
     nom:p_nom.value,
-prenom:p_prenom.value,
-naissance:p_naissance.value,
-sexe:p_sexe.value,
-ipp:p_ipp.value,
-dossier:p_dossier.value,
+    prenom:p_prenom.value,
+    naissance:p_naissance.value,
+    sexe:p_sexe.value,
+    ipp:p_ipp.value,
+    dossier:p_dossier.value,
+
     from:m_from.value,
     to:m_to.value,
     room:m_room.value,
     mode:m_mode.value,
+
     b1:m_b1.value,
     b2:m_b2.value,
+
     type:m_type.value
   };
 
@@ -496,20 +463,16 @@ dossier:p_dossier.value,
 }
 
 
-/* === CLEAR === */
-
 function clearMission(){
 
 [
 "p_nom","p_prenom","p_naissance","p_sexe",
-"p_ipp","p_dossier",
-"m_from","m_to","m_room","m_b1","m_b2"
+"p_ipp","p_dossier","m_room"
 ]
 .forEach(i=>{
   const el=document.getElementById(i);
   if(el) el.value="";
 });
-
 
 }
 
@@ -517,134 +480,14 @@ function clearMission(){
 /* === STORAGE === */
 
 function save(){
+
   localStorage.setItem("ns_plan",JSON.stringify(planning));
   localStorage.setItem("ns_log",JSON.stringify(journal));
+  localStorage.setItem("ns_settings",JSON.stringify(settings));
 }
 
 
-/* === INIT === */
-
-render();
-loadSettings();
-  
-
-
-  /* === IMAGE PREPROCESS === */
-
-function preprocessImage(file){
-
-  return new Promise(resolve=>{
-
-    const img = new Image();
-    const reader = new FileReader();
-
-    reader.onload = e=>{
-      img.src = e.target.result;
-    };
-
-    img.onload = ()=>{
-
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-
-      canvas.width = img.width;
-      canvas.height = img.height;
-
-      ctx.drawImage(img,0,0);
-
-      const data = ctx.getImageData(0,0,canvas.width,canvas.height);
-      const d = data.data;
-
-      for(let i=0;i<d.length;i+=4){
-
-        const avg = (d[i]+d[i+1]+d[i+2])/3;
-
-        const v = avg > 140 ? 255 : 0;
-
-        d[i]=d[i+1]=d[i+2]=v;
-      }
-
-      ctx.putImageData(data,0,0);
-
-      resolve(canvas);
-    };
-
-    reader.readAsDataURL(file);
-  });
-}
-
-  /* === OCR === */
-
-async function scanBracelet(){
-
-  const file = document.getElementById("scan").files[0];
-
-  if(!file){
-    alert("Prends une photo du bracelet");
-    return;
-  }
-
-  const img = await preprocessImage(file);
-
-  const result = await Tesseract.recognize(
-    img,
-    "fra",
-    {
-      tessedit_char_whitelist:
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789()/ :",
-      logger: m => console.log(m)
-    }
-  );
-
-  const text = result.data.text;
-
-  console.log("OCR brut:", text);
-
-  parseBracelet(text);
-}
-
-
-/* === PARSING === */
-
-  
-function parseBracelet(txt){
-
-  txt = txt.replace(/\s+/g," ");
-
-  console.log("Nettoyé:",txt);
-
-  // NOM + PRENOM
-  const nameMatch = txt.match(/([A-Z]{3,}) ([A-Z]{3,})/);
-
-  if(nameMatch){
-    p_nom.value = nameMatch[1];
-    p_prenom.value = nameMatch[2];
-  }
-
-  // DATE NAISSANCE
-  const birth = txt.match(/\d{2}\/\d{2}\/\d{4}/);
-  if(birth) p_naissance.value = birth[0];
-
-  // SEXE
-  const sex = txt.match(/\((M|F)\)/);
-  if(sex) p_sexe.value = sex[1];
-
-  // IPP
-  const ipp = txt.match(/IPP[: ]*([0-9]{6,12})/i);
-  if(ipp) p_ipp.value = ipp[1];
-
-  // DOSSIER
-  const dossier = txt.match(/\b3\d{7,8}\b/);
-  if(dossier) p_dossier.value = dossier[0];
-
-}
-
-
-
-function saveSettings(){
-  localStorage.setItem("ns_settings", JSON.stringify(settings));
-}
-
+/* === SETTINGS === */
 
 function loadSettings(){
 
@@ -655,41 +498,38 @@ function loadSettings(){
 
 function renderSettings(){
 
-  renderList("from","list_from","set_from");
-  renderList("to","list_to","set_to");
-  renderList("staff","list_staff","set_staff");
-
+  renderList("from","list_from");
+  renderList("to","list_to");
+  renderList("staff","list_staff");
 }
 
 
-function renderList(key,container,input){
+function renderList(key,container){
 
-  const box = document.getElementById(container);
+  const box=document.getElementById(container);
 
   box.innerHTML="";
 
   settings[key].forEach((v,i)=>{
 
-    box.innerHTML += `
-      <div class="item">
-        ${v}
-        <button onclick="removeSetting('${key}',${i})">❌</button>
-      </div>
-    `;
+    box.innerHTML+=`
+    <div class="item">
+      ${v}
+      <button onclick="removeSetting('${key}',${i})">❌</button>
+    </div>`;
   });
-
 }
 
 
 function addSetting(key){
 
-  const map = {
+  const map={
     from:"set_from",
     to:"set_to",
     staff:"set_staff"
   };
 
-  const input = document.getElementById(map[key]);
+  const input=document.getElementById(map[key]);
 
   if(!input.value) return;
 
@@ -697,9 +537,8 @@ function addSetting(key){
 
   input.value="";
 
-  saveSettings();
-  renderSettings();
-  loadLists();
+  save();
+  loadSettings();
 }
 
 
@@ -707,13 +546,12 @@ function removeSetting(key,i){
 
   settings[key].splice(i,1);
 
-  saveSettings();
-  renderSettings();
-  loadLists();
+  save();
+  loadSettings();
 }
 
 
-/* === SELECT LISTS === */
+/* === SELECTS === */
 
 function loadLists(){
 
@@ -730,19 +568,111 @@ function loadLists(){
 
 function fill(id,list){
 
-  const el = document.getElementById(id);
-
+  const el=document.getElementById(id);
   if(!el) return;
 
-  el.innerHTML = `<option value="">-- Choisir --</option>`;
+  el.innerHTML=`<option value="">-- Choisir --</option>`;
 
   list.forEach(v=>{
-    el.innerHTML += `<option>${v}</option>`;
+    el.innerHTML+=`<option>${v}</option>`;
   });
 }
- 
+
+
+/* === OCR PREPROCESS === */
+
+function preprocessImage(file){
+
+  return new Promise(resolve=>{
+
+    const img=new Image();
+    const reader=new FileReader();
+
+    reader.onload=e=>img.src=e.target.result;
+
+    img.onload=()=>{
+
+      const c=document.createElement("canvas");
+      const ctx=c.getContext("2d");
+
+      c.width=img.width;
+      c.height=img.height;
+
+      ctx.drawImage(img,0,0);
+
+      const d=ctx.getImageData(0,0,c.width,c.height);
+      const p=d.data;
+
+      for(let i=0;i<p.length;i+=4){
+
+        const a=(p[i]+p[i+1]+p[i+2])/3;
+        const v=a>140?255:0;
+
+        p[i]=p[i+1]=p[i+2]=v;
+      }
+
+      ctx.putImageData(d,0,0);
+
+      resolve(c);
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+
+/* === OCR === */
+
+async function scanBracelet(){
+
+  const file=scan.files[0];
+
+  if(!file){
+    alert("Photo manquante");
+    return;
+  }
+
+  const img=await preprocessImage(file);
+
+  const r=await Tesseract.recognize(img,"fra");
+
+  parseBracelet(r.data.text);
+}
+
+
+/* === PARSE === */
+
+function parseBracelet(txt){
+
+  txt=txt.replace(/\s+/g," ");
+
+  const name=txt.match(/([A-Z]{3,}) ([A-Z]{3,})/);
+
+  if(name){
+    p_nom.value=name[1];
+    p_prenom.value=name[2];
+  }
+
+  const birth=txt.match(/\d{2}\/\d{2}\/\d{4}/);
+  if(birth) p_naissance.value=birth[0];
+
+  const sex=txt.match(/\((M|F)\)/);
+  if(sex) p_sexe.value=sex[1];
+
+  const ipp=txt.match(/IPP[: ]*([0-9]+)/i);
+  if(ipp) p_ipp.value=ipp[1];
+
+  const dos=txt.match(/\b3\d{7,8}\b/);
+  if(dos) p_dossier.value=dos[0];
+}
+
+
+/* === INIT === */
+
+render();
+loadSettings();
+
 </script>
 
 </body>
 </html>
-
