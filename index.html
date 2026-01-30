@@ -383,7 +383,7 @@ function render(){
 
   planning
   .filter(p=>p.date===today())
-  .sort((a,b)=>a.time.localeCompare(b.time))
+  .sort((a,b)=>(a.time||"").localeCompare(b.time||""))
   .forEach(p=>{
 
     planList.innerHTML+=`
@@ -642,13 +642,16 @@ async function scanBracelet(){
   const img = await preprocessImage(file);
 
   const result = await Tesseract.recognize(
+    img,
+    "fra",
     {
-  tessedit_char_whitelist:
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789()/ :-",
-  preserve_interword_spaces: 1,
-  tessedit_pageseg_mode: 6,
-  logger: m => console.log(m)
-}
+      tessedit_char_whitelist:
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789()/ :-",
+      preserve_interword_spaces: 1,
+      tessedit_pageseg_mode: 6,
+      logger: m => console.log(m)
+    }
+  );
 
   const text = result.data.text;
 
@@ -656,7 +659,6 @@ async function scanBracelet(){
 
   parseBracelet(text);
 }
-
 
 /* === PARSE === */
 
