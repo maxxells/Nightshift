@@ -337,7 +337,25 @@ let settings = JSON.parse(localStorage.getItem("ns_settings")) || {
   staff:["Jean","Paul"]
 };
 
+// === OCR Apple via Shortcuts ===
 
+(function(){
+
+  const params = new URLSearchParams(window.location.search);
+  const ocr = params.get("ocr");
+
+  if(!ocr) return;
+
+  const text = decodeURIComponent(ocr);
+
+  console.log("OCR Apple reçu:", text);
+
+  parseBracelet(text);
+
+  // Nettoie l’URL
+  history.replaceState({}, document.title, location.pathname);
+
+})();
 /* === DATE === */
 
 function today(){
