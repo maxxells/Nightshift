@@ -733,7 +733,29 @@ function parseBracelet(txt){
   if(dossier) p_dossier.value = dossier[0];
 
 }
+/* === LECTURE OCR DEPUIS RACCOURCI iOS === */
 
+function readOCRfromURL(){
+
+  const params = new URLSearchParams(window.location.search);
+
+  if(!params.has("ocr")) return;
+
+  let txt = params.get("ocr");
+
+  if(!txt) return;
+
+  txt = decodeURIComponent(txt);
+
+  console.log("OCR depuis iOS:", txt);
+
+  parseBracelet(txt);
+
+  // Nettoyage URL (optionnel mais propre)
+  history.replaceState({}, document.title, window.location.pathname);
+}
+
+readOCRfromURL();
 /* === INIT === */
 
 render();
