@@ -16,7 +16,7 @@
 
 <style>
 
-/* === THEME === */
+/* === THEME === */il
 
 :root{
   --bg:#071420;
@@ -754,14 +754,29 @@ function readOCRfromURL(){
   // Nettoyage URL (optionnel mais propre)
   history.replaceState({}, document.title, window.location.pathname);
 }
+async function readFromClipboard(){
 
+  try{
+
+    const txt = await navigator.clipboard.readText();
+
+    if(!txt) return;
+
+    console.log("OCR clipboard:", txt);
+
+    parseBracelet(txt);
+
+  }catch(e){
+    console.log("Clipboard bloqué", e);
+  }
+}
 
 /* === INIT === */
 
 
+readFromClipboard();
 render();
 loadSettings();
-readOCRfromURL();
 </script>
 
 </body>
